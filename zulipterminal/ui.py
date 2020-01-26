@@ -71,8 +71,8 @@ class View(urwid.WidgetWrap):
         ]
 
     @asynch
-    def set_footer_text(self, text_list: Optional[List[Any]]=None,
-                        duration: Optional[float]=None) -> None:
+    def set_footer_text(self, text_list: Optional[List[Any]] = None,
+                        duration: Optional[float] = None) -> None:
         if text_list is None:
             text = self.get_random_help()
         else:

@@ -50,7 +50,7 @@ class ModListWalker(urwid.SimpleFocusListWalker):
             self.read_message()
 
     def extend(self, items: List[Any],
-               focus_position: Optional[int]=None) -> int:
+               focus_position: Optional[int] = None) -> int:
         if focus_position is None:
             focus = self._adjust_focus_on_contents_modified(
                 slice(len(self), len(self)), items)
@@ -87,7 +87,7 @@ class MessageView(urwid.ListBox):
         return msg_btn_list
 
     @asynch
-    def load_old_messages(self, anchor: int=10000000000) -> None:
+    def load_old_messages(self, anchor: int = 10000000000) -> None:
         self.old_loading = True
 
         ids_to_keep = self.model.get_message_ids_in_current_narrow()
@@ -213,13 +213,13 @@ class MessageView(urwid.ListBox):
         top_header = message_view.top_search_bar()
         self.model.controller.view.search_box.conversation_focus.set_text(
             top_header.markup
-            )
+        )
         self.model.controller.view.search_box.msg_narrow.set_text(
             recipient_bar.markup
-            )
+        )
         self.model.controller.update_screen()
 
-    def read_message(self, index: int=-1) -> None:
+    def read_message(self, index: int = -1) -> None:
         # Message currently in focus
         if hasattr(self.model.controller, "view"):
             view = self.model.controller.view
@@ -391,7 +391,7 @@ class TopicsView(urwid.Frame):
             self.view.left_panel.contents[1] = (
                 self.view.left_panel.stream_v,
                 self.view.left_panel.options(height_type="weight")
-                )
+            )
             self.view.left_panel.is_in_topic_view = False
         elif is_command_key('GO_RIGHT', key):
             self.view.show_left_panel(visible=False)
@@ -557,16 +557,16 @@ class RightColumnView(urwid.Frame):
             self.user_search, tlcorner=u'─', tline=u'', lline=u'',
             trcorner=u'─', blcorner=u'─', rline=u'',
             bline=u'─', brcorner=u'─'
-            )
+        )
         self.allow_update_user_list = True
         self.search_lock = threading.Lock()
         super(RightColumnView, self).__init__(self.users_view(),
                                               header=search_box)
 
     @asynch
-    def update_user_list(self, search_box: Any=None,
-                         new_text: str="",
-                         user_list: Any=None) -> None:
+    def update_user_list(self, search_box: Any = None,
+                         new_text: str = "",
+                         user_list: Any = None) -> None:
 
         assert ((user_list is None and search_box is not None) or
                 (user_list is not None and search_box is None and
@@ -592,7 +592,7 @@ class RightColumnView(urwid.Frame):
             self.set_body(self.body)
             self.view.controller.update_screen()
 
-    def users_view(self, users: Any=None) -> Any:
+    def users_view(self, users: Any = None) -> Any:
         reset_default_view_users = False
         if users is None:
             users = self.view.users.copy()
@@ -684,13 +684,13 @@ class LeftColumnView(urwid.Pile):
 
     def streams_view(self) -> Any:
         streams_btn_list = [
-                StreamButton(
-                    stream,
-                    controller=self.controller,
-                    view=self.view,
-                    width=self.width,
-                    count=self.model.unread_counts['streams'].get(stream[1], 0)
-                ) for stream in self.view.pinned_streams]
+            StreamButton(
+                stream,
+                controller=self.controller,
+                view=self.view,
+                width=self.width,
+                count=self.model.unread_counts['streams'].get(stream[1], 0)
+            ) for stream in self.view.pinned_streams]
 
         if len(streams_btn_list):
             unpinned_divider = urwid.Divider("-")
@@ -703,13 +703,13 @@ class LeftColumnView(urwid.Pile):
             streams_btn_list += [unpinned_divider]
 
         streams_btn_list += [
-                StreamButton(
-                    stream,
-                    controller=self.controller,
-                    view=self.view,
-                    width=self.width,
-                    count=self.model.unread_counts['streams'].get(stream[1], 0)
-                ) for stream in self.view.unpinned_streams]
+            StreamButton(
+                stream,
+                controller=self.controller,
+                view=self.view,
+                width=self.width,
+                count=self.model.unread_counts['streams'].get(stream[1], 0)
+            ) for stream in self.view.unpinned_streams]
 
         self.view.stream_id_to_button = {stream.stream_id: stream
                                          for stream in streams_btn_list
@@ -721,7 +721,7 @@ class LeftColumnView(urwid.Pile):
             tlcorner=u'━', tline=u'━', lline=u'',
             trcorner=u'━', blcorner=u'', rline=u'',
             bline=u'', brcorner=u'─'
-            )
+        )
         return w
 
     def topics_view(self, stream_button: Any) -> Any:
@@ -743,7 +743,7 @@ class LeftColumnView(urwid.Pile):
             tlcorner=u'━', tline=u'━', lline=u'',
             trcorner=u'━', blcorner=u'', rline=u'',
             bline=u'', brcorner=u'─'
-            )
+        )
         return w
 
     def keypress(self, size: Tuple[int, int], key: str) -> str:
@@ -787,7 +787,7 @@ class HelpView(urwid.ListBox):
                             urwid.Text(binding['help_text']),
                             (max_widths[1],
                                 urwid.Text(", ".join(binding['keys'])))
-                            ], dividechars=2),
+                        ], dividechars=2),
                         None if help_item_number % 2 else 'help'
                     )
                 )
@@ -840,6 +840,21 @@ class PopUpConfirmationView(urwid.Overlay):
         return super(PopUpConfirmationView, self).keypress(size, key)
 
 
+class StreamInfoView(urwid.ListBox):
+    def __init__(self, controller: Any, color: Any, name: Any, desc: Any) -> None:
+        self.controller = controller
+        self.width = max(len(desc), len(name))
+        self.height = 3
+        self.name = urwid.Text((color, name), align='center')
+        self.desc = urwid.Text(desc, align='center')
+        super(StreamInfoView, self).__init__([self.name, self.desc])
+
+    def keypress(self, size: Tuple[int, int], key: str) -> str:
+        if is_command_key('GO_BACK', key) or is_command_key('MSG_INFO', key):
+            self.controller.exit_popup()
+        return super(StreamInfoView, self).keypress(size, key)
+
+
 class MsgInfoView(urwid.ListBox):
     def __init__(self, controller: Any, msg: Any) -> None:
         self.controller = controller
@@ -847,11 +862,11 @@ class MsgInfoView(urwid.ListBox):
 
         if msg['reactions']:
             reactions = sorted(
-                        [reaction['emoji_name'] +
-                            ": " +
-                            reaction['user']['full_name'] +
-                            "\n"
-                            for reaction in msg['reactions']])
+                [reaction['emoji_name'] +
+                 ": " +
+                 reaction['user']['full_name'] +
+                 "\n"
+                 for reaction in msg['reactions']])
             reactions[-1] = reactions[-1].rstrip("\n")
 
         msg_info = OrderedDict([
@@ -859,12 +874,12 @@ class MsgInfoView(urwid.ListBox):
             ('Sender', msg['sender_full_name']),
             ('Sender\'s Email ID', msg['sender_email']),
             ('Reactions', reactions if msg['reactions'] else '---None---'),
-            ])
+        ])
 
         widths = [(len(field)+7,
-                  max(len(reaction_users) for reaction_users in data)
-                  if isinstance(data, list)
-                  else len(data)+2)
+                   max(len(reaction_users) for reaction_users in data)
+                   if isinstance(data, list)
+                   else len(data)+2)
                   for field, data in msg_info.items()]
         max_widths = [max(width) for width in zip(*widths)]
         self.width = sum(max_widths)

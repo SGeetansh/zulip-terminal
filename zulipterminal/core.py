@@ -14,7 +14,7 @@ from zulipterminal.helper import asynch
 from zulipterminal.model import Model, GetMessagesArgs, ServerConnectionFailure
 from zulipterminal.ui import View, Screen
 from zulipterminal.ui_tools.utils import create_msg_box_list
-from zulipterminal.ui_tools.views import HelpView, MsgInfoView
+from zulipterminal.ui_tools.views import HelpView, MsgInfoView, StreamInfoView
 from zulipterminal.config.themes import ThemeSpec
 from zulipterminal.ui_tools.views import PopUpConfirmationView
 
@@ -61,7 +61,7 @@ class Controller:
 
         self.capture_stdout()
 
-    def capture_stdout(self, path: str='debug.log') -> None:
+    def capture_stdout(self, path: str = 'debug.log') -> None:
         if hasattr(self, '_stdout'):
             return
 
@@ -114,6 +114,10 @@ class Controller:
         msg_info_view = MsgInfoView(self, msg)
         self.show_pop_up(msg_info_view,
                          "Message Information (up/down scrolls)")
+
+    def show_stream_info(self, color: Any, name: Any, desc: Any) -> None:
+        show_stream_view = StreamInfoView(self, color, name, desc)
+        self.show_pop_up(show_stream_view, "Stream Description")
 
     def search_messages(self, text: str) -> None:
         # Search for a text in messages

@@ -6,7 +6,7 @@ from zulipterminal.config.keys import is_command_key, keys_for_command
 
 
 class MenuButton(urwid.Button):
-    def __init__(self, caption: Any, email: str='') -> None:
+    def __init__(self, caption: Any, email: str = '') -> None:
         self.caption = caption  # str
         self.email = email
         super(MenuButton, self).__init__("")
@@ -17,9 +17,9 @@ class MenuButton(urwid.Button):
 class TopButton(urwid.Button):
     def __init__(self, controller: Any, caption: str,
                  show_function: Callable[..., Any], width: int,
-                 prefix_character: Union[str, Tuple[Any, str]]='\N{BULLET}',
-                 text_color: Optional[str]=None,
-                 count: int=0) -> None:
+                 prefix_character: Union[str, Tuple[Any, str]] = '\N{BULLET}',
+                 text_color: Optional[str] = None,
+                 count: int = 0) -> None:
         if isinstance(prefix_character, tuple):
             prefix = prefix_character[1]
         else:
@@ -84,7 +84,7 @@ class TopButton(urwid.Button):
 
 
 class HomeButton(TopButton):
-    def __init__(self, controller: Any, width: int, count: int=0) -> None:
+    def __init__(self, controller: Any, width: int, count: int = 0) -> None:
         button_text = ("All messages   [" +
                        keys_for_command("GO_BACK").pop() +  # FIXME
                        "]")
@@ -95,7 +95,7 @@ class HomeButton(TopButton):
 
 
 class PMButton(TopButton):
-    def __init__(self, controller: Any, width: int, count: int=0) -> None:
+    def __init__(self, controller: Any, width: int, count: int = 0) -> None:
         button_text = ("Private messages [" +
                        keys_for_command("ALL_PM").pop() +
                        "]")
@@ -120,10 +120,10 @@ class StarredButton(TopButton):
 class StreamButton(TopButton):
     def __init__(self, properties: List[Any],
                  controller: Any, view: Any, width: int,
-                 count: int=0) -> None:
+                 count: int = 0) -> None:
         # FIXME Is having self.stream_id the best way to do this?
         # (self.stream_id is used elsewhere)
-        self.stream_name, self.stream_id, color, is_private = properties
+        self.stream_name, self.stream_id, self.color, is_private, self.description = properties
         self.model = controller.model
         self.count = count
         self.view = view
@@ -133,13 +133,16 @@ class StreamButton(TopButton):
                 background = entry[5] if len(entry) > 4 else entry[2]
                 inverse_text = background if background else 'black'
                 break
-        view.palette.append((color, '', '', '', color+', bold', background))
-        view.palette.append(('s' + color, '', '', '', inverse_text, color))
+        view.palette.append(
+            (self.color, '', '', '', self.color+', bold', background))
+        view.palette.append(
+            ('s' + self.color, '', '', '', inverse_text, self.color))
 
         super().__init__(controller,
                          caption=self.stream_name,
                          show_function=controller.narrow_to_stream,
-                         prefix_character=(color, 'P' if is_private else '#'),
+                         prefix_character=(
+                             self.color, 'P' if is_private else '#'),
                          width=width,
                          count=count)
 
@@ -171,16 +174,19 @@ class StreamButton(TopButton):
             self.view.left_panel.contents[1] = (
                 topic_view,
                 self.view.left_panel.options(height_type="weight")
-                )
+            )
         elif is_command_key('TOGGLE_MUTE_STREAM', key):
             self.controller.stream_muting_confirmation_popup(self)
+        elif is_command_key('MSG_INFO', key):
+            self.model.controller.show_stream_info(
+                self.color, self.stream_name, self.description)
         return super().keypress(size, key)
 
 
 class UserButton(TopButton):
     def __init__(self, user: Dict[str, Any], controller: Any,
                  view: Any, width: int,
-                 color: Optional[str]=None, count: int=0) -> None:
+                 color: Optional[str] = None, count: int = 0) -> None:
         # Properties accessed externally
         self.email = user['email']
         self.user_id = user['user_id']
@@ -208,7 +214,7 @@ class UserButton(TopButton):
 
 class TopicButton(TopButton):
     def __init__(self, stream_id: int, topic: str,
-                 controller: Any, width: int=0, count: int=0) -> None:
+                 controller: Any, width: int = 0, count: int = 0) -> None:
         self.stream_name = controller.model.stream_dict[stream_id]['name']
         self.topic_name = topic
         self.stream_id = stream_id

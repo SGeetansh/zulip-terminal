@@ -6,8 +6,8 @@ import time
 from collections import OrderedDict
 
 from typing import (
-        Any, Dict, List, FrozenSet, Set, Union, Optional, Tuple, Callable,
-        Iterable
+    Any, Dict, List, FrozenSet, Set, Union, Optional, Tuple, Callable,
+    Iterable
 )
 from mypy_extensions import TypedDict
 
@@ -26,10 +26,10 @@ from zulipterminal.helper import (
 from zulipterminal.ui_tools.utils import create_msg_box_list
 
 GetMessagesArgs = TypedDict('GetMessagesArgs', {
-     'num_before': int,
-     'num_after': int,
-     'anchor': Optional[int]
-    })
+    'num_before': int,
+    'num_after': int,
+    'anchor': Optional[int]
+})
 
 Event = TypedDict('Event', {
     'type': str,
@@ -147,11 +147,11 @@ class Model:
         return 'search' in [subnarrow[0] for subnarrow in self.narrow]
 
     def set_narrow(self, *,
-                   stream: Optional[str]=None,
-                   topic: Optional[str]=None,
-                   pms: bool=False,
-                   pm_with: Optional[str]=None,
-                   starred: bool=False) -> bool:
+                   stream: Optional[str] = None,
+                   topic: Optional[str] = None,
+                   pms: bool = False,
+                   pm_with: Optional[str] = None,
+                   starred: bool = False) -> bool:
         selected_params = {k for k, v in locals().items() if k != 'self' and v}
         valid_narrows = {
             frozenset(): [],
@@ -221,12 +221,12 @@ class Model:
 
     def _notify_server_of_presence(self) -> Dict[str, Any]:
         response = self.client.update_presence(
-                request={
-                    # TODO: Determine `status` from terminal tab focus.
-                    'status': 'active' if self.new_user_input else 'idle',
-                    'new_user_input': self.new_user_input,
-                }
-            )
+            request={
+                # TODO: Determine `status` from terminal tab focus.
+                'status': 'active' if self.new_user_input else 'idle',
+                'new_user_input': self.new_user_input,
+            }
+        )
         self.new_user_input = False
         return response
 
@@ -264,9 +264,9 @@ class Model:
             reaction['emoji_code']
             for reaction in message['reactions']
             if (('user_id' in reaction['user'] and
-                reaction['user']['user_id'] == self.user_id)) or
+                 reaction['user']['user_id'] == self.user_id)) or
                (('id' in reaction['user'] and
-                reaction['user']['id'] == self.user_id))
+                 reaction['user']['id'] == self.user_id))
         ]
         if reaction_to_toggle_spec['emoji_code'] in existing_reactions:
             response = self.client.remove_reaction(reaction_to_toggle_spec)
@@ -315,24 +315,24 @@ class Model:
         return response['result'] == 'success'
 
     def update_private_message(self, msg_id: int, content: str) -> bool:
-            request = {
-                "message_id": msg_id,
-                "content": content,
-            }
-            response = self.client.update_message(request)
-            return response['result'] == 'success'
+        request = {
+            "message_id": msg_id,
+            "content": content,
+        }
+        response = self.client.update_message(request)
+        return response['result'] == 'success'
 
     def update_stream_message(self, topic: str, msg_id: int,
                               content: str) -> bool:
-            request = {
-                "message_id": msg_id,
-                "content": content,
-                # TODO: Add support for "change_later" & "change_all"
-                "propagate_mode": "change_one",
-                "subject": topic,
-            }
-            response = self.client.update_message(request)
-            return response['result'] == 'success'
+        request = {
+            "message_id": msg_id,
+            "content": content,
+            # TODO: Add support for "change_later" & "change_all"
+            "propagate_mode": "change_one",
+            "subject": topic,
+        }
+        response = self.client.update_message(request)
+        return response['result'] == 'success'
 
     def get_messages(self, *,
                      num_after: int, num_before: int,
@@ -559,7 +559,8 @@ class Model:
     def _stream_info_from_subscriptions(
             subscriptions: List[Dict[str, Any]]
     ) -> Tuple[Dict[int, Any], Set[int], List[List[str]], List[List[str]]]:
-        stream_keys = ('name', 'stream_id', 'color', 'invite_only')
+        stream_keys = ('name', 'stream_id', 'color',
+                       'invite_only', 'description')
 
         # Canonicalize color formats, since zulip server versions may use
         # different formats
@@ -845,8 +846,8 @@ class Model:
                     # current narrow.
                     if not self.msg_list.log:
                         msg_w_list = create_msg_box_list(
-                                        self, [msg_id],
-                                        last_message=msg_box.last_message)
+                            self, [msg_id],
+                            last_message=msg_box.last_message)
                         if msg_w_list:
                             self.controller.narrow_to_topic(
                                 msg_w_list[0].original_widget)
@@ -854,8 +855,8 @@ class Model:
                     return
 
                 msg_w_list = create_msg_box_list(
-                                self, [msg_id],
-                                last_message=msg_box.last_message)
+                    self, [msg_id],
+                    last_message=msg_box.last_message)
                 if not msg_w_list:
                     return
                 else:
@@ -874,7 +875,7 @@ class Model:
                     self.controller.update_screen()
                     return
 
-    def _register_desired_events(self, *, fetch_data: bool=False) -> bool:
+    def _register_desired_events(self, *, fetch_data: bool = False) -> bool:
         fetch_types = None if not fetch_data else [
             'realm',
             'presence',
