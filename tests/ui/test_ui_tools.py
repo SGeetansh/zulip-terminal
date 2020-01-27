@@ -15,6 +15,7 @@ from zulipterminal.ui_tools.views import (
     ModListWalker,
     PopUpConfirmationView,
     MsgInfoView,
+    StreamInfoView
 )
 from zulipterminal.ui_tools.boxes import MessageBox
 from zulipterminal.ui_tools.buttons import (
@@ -1137,6 +1138,60 @@ class TestPopUpConfirmationView:
         self.callback.assert_not_called()
         assert self.controller.exit_popup.called
 
+class TestStreamInfoView:
+    @pytest.fixture(autouse=True)
+     def mock_external_classes(self, mocker, monkeypatch, color, name, stream_fixature):
+        self.controller = mocker.Mock()
+        mocker.patch(VIEWS + ".urwid.SimpleFocusListWalker", return_value=[])
+        self.stream_info_view = StreamInfoView(self.controller, color, name, stream_fixature)
+    
+    def test_keypress_any_key(self):
+        key = "a"
+        size = (200, 20)
+        self.msg_info_view.keypress(size, key)
+        assert not self.controller.exit_popup.called
+
+    @pytest.mark.parametrize('key', keys_for_command("GO_BACK"))
+    def test_keypress_goback(self, key):
+        size = (200, 20)
+        self.msg_info_view.keypress(size, key)
+        assert self.controller.exit_popup.called
+
+    @pytest.mark.parametrize('width, count, sample_desc', [
+        (8, 0, 'ca…'),
+        (9, 0, 'cap…'),
+        (9, 1, 'ca…'),
+        (10, 0, 'capt…'),
+        (10, 1, 'cap…'),
+        (11, 0, 'capti…'),
+        (11, 1, 'capt…'),
+        (11, 10, 'cap…'),
+        (12, 0, 'caption'),
+        (12, 1, 'capti…'),
+        (12, 10, 'capt…'),
+        (12, 100, 'cap…'),
+        (13, 0, 'caption'),
+        (13, 10, 'capti…'),
+        (13, 100, 'capt…'),
+        (13, 1000, 'cap…'),
+        (15, 0, 'caption'),
+        (15, 1, 'caption'),
+        (15, 10, 'caption'),
+        (15, 100, 'caption'),
+        (15, 1000, 'capti…'),
+        (25, 0, 'caption'),
+        (25, 1, 'caption'),
+        (25, 19, 'caption'),
+        (25, 199, 'caption'),
+        (25, 1999, 'caption'),
+    ])
+    
+
+
+
+
+
+    
 
 class TestMsgInfoView:
     @pytest.fixture(autouse=True)
